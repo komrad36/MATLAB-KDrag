@@ -1,4 +1,4 @@
-# KDrag
+# MATLAB-KDrag
 Orbital and attitude propagator with B-dot and *dynamic* aerodynamic drag simulation, including torque computation for aero-stabilized bodies.
 
 This project is in three parts:
