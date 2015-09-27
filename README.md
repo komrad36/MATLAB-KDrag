@@ -2,9 +2,12 @@
 Orbital and attitude propagator with B-dot and *dynamic* aerodynamic drag simulation, including torque computation for aero-stabilized bodies.
 
 This project is in three parts:
+
 1) MATLAB orbital and attitude propagator with rotating orbital frame, B-dot,
 and calls to an aerodynamics engine.
+
 2) The full MATLAB aerodynamics engine, KDrag.
+
 3) A fast, low-precision reference aero engine called 'aer'.
 
 KDrag is my MATLAB implementation of my orbital aerodynamics simulation.
