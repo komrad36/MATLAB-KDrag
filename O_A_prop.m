@@ -82,7 +82,7 @@ function O_A_prop
  
     long_ax = zeros(num_pts,3);
     for i = 1:num_pts
-        long_ax(i,:) = v_rot_q([0; 0; 1], quat_inv(all_states(i, 7:10)'))';
+        long_ax(i,:) = v_rot_q([0; 0; 1],quat_inv(all_states(i, 7:10)'))';
     end
     pointing_err_ang = real(acosd(long_ax(:,1)/max(long_ax(:,1))));
     subplot(4, 1, 3)
@@ -128,15 +128,13 @@ function state = attitudeDiffEq(t, state)
         pos_quat, t, datenum([2015, 12, 12]));
     
     ang_vel = state(11:13);
-    b_dot = cross(mag_field_body, ang_vel);
-    des_mag_moment = bdot_gain*b_dot;
     % altitude of 500 km for now. see TODO above - will include aeroforce
     % for orbital decay
     [~, aero_torque] = KDrag(500, pos_quat, 135, norm(state(4:6)));
-    torque = cross(des_mag_moment, mag_field_body) - aero_torque;
-    ang_mom = moi_matrix*ang_vel;
-    ang_accel = calc_ang_accel(torque, ang_vel, ang_mom, moi_matrix);
-    
+    torque = cross(bdot_gain*cross(mag_field_body, ang_vel), mag_field_body) - aero_torque;
+  
+%     dH/dt = H x w + T
+    ang_accel = (inv(moi_matrix))*(cross(moi_matrix*ang_vel, ang_vel) + torque);
     state = [get_quat_der(state(7:13)); ang_accel];
 end
 

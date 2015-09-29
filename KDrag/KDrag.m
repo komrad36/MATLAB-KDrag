@@ -21,7 +21,7 @@
 % This module can be tested standalone (see the 'caller.m' function),
 % but it is intended for use by a 6 DoF orbital/attitude propagator which
 % calls this module from its integrator to obtain forces and/or torques.
-%
+% 
 % Inputs:
 %   alt   - altitude in km
 %   q     - orbital to body quaternion
