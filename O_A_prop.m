@@ -44,13 +44,13 @@ function O_A_prop
     all_states = [state; zeros(20000, 13)];
     state_idx = 2;
     
-    options = odeset('RelTol',1e-13, 'MaxStep', 100); % error bound
-    increment = 15; % Seconds between each orbital frame rotation
-    tspan = [0 increment]; % integrate for specified time
-    while tspan(1) < time_span  
+    options = odeset('RelTol',1e-13, 'MaxStep', 50);
+    increment = 15; % Seconds between orbital frame rotations
+    t_segment = [0 increment];
+    while t_segment(1) < time_span  
         [time, state] = ode45(@(t, state) [state(4:6);
             -398600/norm(state(1:3))^3.*state(1:3);
-            attitudeDiffEq(t, state)], tspan, state(end, :), options);
+            attitude_diff_eq(t, state)], t_segment, state(end, :), options);
 
         all_times(time_idx:time_idx + numel(time) - 1) = time;
         time_idx = time_idx + numel(time);
@@ -58,9 +58,9 @@ function O_A_prop
         all_states(state_idx:state_idx + size(state, 1) - 1, :) = state;
         state_idx = state_idx + size(state, 1);
         
-        tspan = [tspan(2), tspan(2) + increment];
+        t_segment = [t_segment(2), t_segment(2) + increment];
         state(end, 7:10) = ...
-            get_rel_quat(calc_orb_rot_quat(norm(state(end, 1:3)'),...
+            get_rel_quat(get_orbital_rotation(norm(state(end, 1:3)'),...
             increment), state(end, 7:10)');
     end
     
@@ -103,21 +103,18 @@ end
 
 % Compute quaternion associated with the orbital
 % frame rotation that occurs after a given period of time
-% for an orbit with a given semi major axis
-function orb_rot_quat = calc_orb_rot_quat(semi_major, time_step)
-    orbit_period = 2*pi*sqrt(semi_major^3/398600); % time of complete orbit
+function orb_rot_quat = get_orbital_rotation(semi_major, time_step)
+    orbit_period = 2*pi*sqrt(semi_major^3/398600);
     angle_change = time_step/orbit_period*360;
-    rot_vect = [0; -1; 0]; % -y axis
+    rot_vect = [0; -1; 0]; % about -y axis
     
-    % This quaternion specifies the orientation of the new orbital frame
-    % relative to the old orbital frame after the given time_step
     orb_rot_quat = makequat(rot_vect, angle_change);
 end
 
 % Propagate attitude, considering aerodynamic torque and
 % B-dot active velocity damping
 % TODO: combine with orbit propagation for aero force
-function state = attitudeDiffEq(t, state)
+function state = attitude_diff_eq(t, state)
     global moi_matrix
 
     pos_quat = state(7:10)/norm(state(7:10));
