@@ -25,6 +25,9 @@ function O_A_prop
     global moi_matrix
     moi_matrix = [.038  0  0; 0 .04 0; 0 0 .0066667];
     
+    
+    global inv_moi_matrix
+    inv_moi_matrix = inv(moi_matrix);
     % quat0 quat1 quat2 quat3 sat_ang_vel(wx wy wz)
     % Angular velocities are in radians/sec
     init_attitude = [1 0 0 0 .1 .25 .03]';
@@ -131,7 +134,7 @@ function state = attitude_diff_eq(t, state)
     torque = cross(bdot_gain*cross(mag_field_body, ang_vel), mag_field_body) - aero_torque;
   
 %     dH/dt = H x w + T
-    ang_accel = (inv(moi_matrix))*(cross(moi_matrix*ang_vel, ang_vel) + torque);
+    ang_accel = inv_moi_matrix*(cross(moi_matrix*ang_vel, ang_vel) + torque);
     state = [get_quat_der(state(7:13)); ang_accel];
 end
 

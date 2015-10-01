@@ -1,5 +1,5 @@
 function gha = get_gha(time)
-    secs_in_day = 86400;
+    secs_in_day = 86164; % sidereal day
     time_of_day = mod(time, secs_in_day); % seconds in current day
     
     % calculate the greenwich hour angle
